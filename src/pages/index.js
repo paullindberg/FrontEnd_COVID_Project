@@ -8,11 +8,11 @@ import Container from "components/Container";
 import Map from "components/Map";
 
 const LOCATION = {
-  lat: 0,
-  lng: 0,
+  lat: 37.0902,
+  lng: -95.7129,
 };
 const CENTER = [LOCATION.lat, LOCATION.lng];
-const DEFAULT_ZOOM = 2;
+const DEFAULT_ZOOM = 5;
 
 const IndexPage = () => {
   /**
