@@ -25,9 +25,9 @@ const IndexPage = () => {
     let response;
 
     try {
-      response = await axios.get("https://corona.lmao.ninja/v2/countries");
+      response = await axios.get("https://covidtracking.com/api/v1/states/current.json");
     } catch (e) {
-      console.log(`Failed to fetch countries: ${e.message}`, e);
+      console.log(`Failed to fetch states: ${e.message}`, e);
       return;
     }
 
@@ -41,13 +41,13 @@ const IndexPage = () => {
 
     const geoJson = {
       type: "FeatureCollection",
-      features: data.map((country = {}) => {
-        const { countryInfo = {} } = country;
-        const { lat, long: lng } = countryInfo;
+      features: data.map((state = {}) => {
+        const { stateInfo = {} } = state;
+        const { lat, long: lng } = stateInfo;
         return {
           type: "Feature",
           properties: {
-            ...country,
+            ...state,
           },
           geometry: {
             type: "Point",
@@ -65,26 +65,26 @@ const IndexPage = () => {
         let updatedFormatted;
         let casesString;
 
-        const { country, updated, cases, deaths, recovered } = properties;
+        const { state, lastModified, positive, death, recovered } = properties;
 
-        casesString = `${cases}`;
-        if (cases > 1000) {
+        casesString = `${positive}`;
+        if (positive > 1000) {
           casesString = `${casesString.slice(0, -3)}k+`;
         }
 
-        if (updated) {
-          updatedFormatted = new Date(updated).toLocaleString();
+        if (lastModified) {
+          updatedFormatted = new Date(lastModified).toLocaleString();
         }
 
         const html = `
           <span class="icon-marker">
             <span class="icon-marker-tooltip">
-              <h2>${country}</h2>
+              <h2>${state}</h2>
               <ul>
-                <li><strong>Confirmed:</strong> ${cases}</li>
-                <li><strong>Deaths:</strong> ${deaths}</li>
+                <li><strong>Positive:</strong> ${positive}</li>
+                <li><strong>Deaths:</strong> ${death}</li>
                 <li><strong>Recovered:</strong> ${recovered}</li>
-                <li><strong>Last Update:</strong> ${updatedFormatted}</li>
+                <li><strong>Last Modified:</strong> ${lastModified}</li>
               </ul>
             </span>
             ${casesString}
