@@ -1,18 +1,18 @@
-import axios from "axios";
 import React from "react";
 import Helmet from "react-helmet";
 import L from "leaflet";
+import current from "./current.json";
 
 import Layout from "components/Layout";
 import Container from "components/Container";
 import Map from "components/Map";
 
 const LOCATION = {
-  lat: 0,
-  lng: 0,
+  lat: 37.0902,
+  lng: -95.7129,
 };
 const CENTER = [LOCATION.lat, LOCATION.lng];
-const DEFAULT_ZOOM = 2;
+const DEFAULT_ZOOM = 5;
 
 const IndexPage = () => {
   /**
@@ -20,34 +20,15 @@ const IndexPage = () => {
    * @description Fires a callback once the page renders
    * @example Here this is and example of being used to zoom in and set a popup on load
    */
-
   async function mapEffect({ leafletElement: map } = {}) {
-    let response;
-
-    try {
-      response = await axios.get("https://corona.lmao.ninja/v2/countries");
-    } catch (e) {
-      console.log(`Failed to fetch countries: ${e.message}`, e);
-      return;
-    }
-
-    const { data = [] } = response;
-
-    const hasData = Array.isArray(data) && data.length > 0;
-    if (!hasData) {
-      return;
-    }
-    console.log(data);
-
     const geoJson = {
       type: "FeatureCollection",
-      features: data.map((country = {}) => {
-        const { countryInfo = {} } = country;
-        const { lat, long: lng } = countryInfo;
+      features: current.map((state = {}) => {
+        const { latitude: lat, longitude: lng } = state;
         return {
           type: "Feature",
           properties: {
-            ...country,
+            ...state,
           },
           geometry: {
             type: "Point",
@@ -59,32 +40,42 @@ const IndexPage = () => {
 
     console.log(geoJson);
 
-    const geoJsonLayers = new L.GeoJSON(geoJson, {
+    const geoJsonLayers = new L.GeoJSON(JSON.parse(JSON.stringify(geoJson)), {
       pointToLayer: (feature = {}, latlng) => {
         const { properties = {} } = feature;
         let updatedFormatted;
         let casesString;
 
-        const { country, updated, cases, deaths, recovered } = properties;
+        const {
+          grade,
+          state,
+          positive,
+          negative,
+          death,
+          recovered,
+          hospitalizedCurrently,
+          totalTestResults,
+          onVentilatorCurrently,
+        } = properties;
 
-        casesString = `${cases}`;
-        if (cases > 1000) {
+        casesString = `${positive}`;
+        if (positive > 1000) {
           casesString = `${casesString.slice(0, -3)}k+`;
-        }
-
-        if (updated) {
-          updatedFormatted = new Date(updated).toLocaleString();
         }
 
         const html = `
           <span class="icon-marker">
             <span class="icon-marker-tooltip">
-              <h2>${country}</h2>
+              <h2>${state}</h2>
               <ul>
-                <li><strong>Confirmed:</strong> ${cases}</li>
-                <li><strong>Deaths:</strong> ${deaths}</li>
+                <li><strong>Grade:</strong> ${grade}</li>
+                <li><strong>Positive:</strong> ${positive}</li>
+                <li><strong>Negative:</strong> ${negative}</li>
+                <li><strong>Death:</strong> ${death}</li>
                 <li><strong>Recovered:</strong> ${recovered}</li>
-                <li><strong>Last Update:</strong> ${updatedFormatted}</li>
+                <li><strong>Hospitalized Currently:</strong> ${hospitalizedCurrently}</li>
+                <li><strong>Total Test Results:</strong> ${totalTestResults}</li>
+                <li><strong>Currently on Ventilator:</strong> ${onVentilatorCurrently}</li>
               </ul>
             </span>
             ${casesString}
