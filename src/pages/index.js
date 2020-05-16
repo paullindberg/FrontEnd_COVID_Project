@@ -2,6 +2,8 @@ import axios from "axios";
 import React from "react";
 import Helmet from "react-helmet";
 import L from "leaflet";
+import current from './current.json'
+
 
 import Layout from "components/Layout";
 import Container from "components/Container";
@@ -20,7 +22,6 @@ const IndexPage = () => {
    * @description Fires a callback once the page renders
    * @example Here this is and example of being used to zoom in and set a popup on load
    */
-
   async function mapEffect({ leafletElement: map } = {}) {
     let response;
 
@@ -31,8 +32,8 @@ const IndexPage = () => {
       return;
     }
 
-    const { data = [] } = response;
 
+    const { data = [] } = response;
     const hasData = Array.isArray(data) && data.length > 0;
     if (!hasData) {
       return;
@@ -41,9 +42,8 @@ const IndexPage = () => {
 
     const geoJson = {
       type: "FeatureCollection",
-      features: data.map((state = {}) => {
-        const { stateInfo = {} } = state;
-        const { lat, long: lng } = stateInfo;
+      features: current.map((state = {}) => {
+        const { latitude: lat, longitude: lng } = state;
         return {
           type: "Feature",
           properties: {
@@ -57,23 +57,22 @@ const IndexPage = () => {
       }),
     };
 
+
     console.log(geoJson);
 
-    const geoJsonLayers = new L.GeoJSON(geoJson, {
+    
+
+    const geoJsonLayers = new L.GeoJSON(JSON.parse(JSON.stringify(geoJson)), {
       pointToLayer: (feature = {}, latlng) => {
         const { properties = {} } = feature;
         let updatedFormatted;
         let casesString;
 
-        const { state, lastModified, positive, death, recovered } = properties;
+        const { state, positive, death} = properties;
 
         casesString = `${positive}`;
         if (positive > 1000) {
           casesString = `${casesString.slice(0, -3)}k+`;
-        }
-
-        if (lastModified) {
-          updatedFormatted = new Date(lastModified).toLocaleString();
         }
 
         const html = `
@@ -82,9 +81,7 @@ const IndexPage = () => {
               <h2>${state}</h2>
               <ul>
                 <li><strong>Positive:</strong> ${positive}</li>
-                <li><strong>Deaths:</strong> ${death}</li>
-                <li><strong>Recovered:</strong> ${recovered}</li>
-                <li><strong>Last Modified:</strong> ${lastModified}</li>
+                <li><strong>Death:</strong> ${death}</li>
               </ul>
             </span>
             ${casesString}
