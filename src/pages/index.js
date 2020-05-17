@@ -1,4 +1,3 @@
-// import axios from "axios";
 import React from "react";
 import Helmet from "react-helmet";
 import L from "leaflet";
@@ -13,7 +12,7 @@ const LOCATION = {
   lng: -95.7129,
 };
 const CENTER = [LOCATION.lat, LOCATION.lng];
-const DEFAULT_ZOOM = 5;
+const DEFAULT_ZOOM = 4;
 
 const IndexPage = () => {
   /**
@@ -22,24 +21,6 @@ const IndexPage = () => {
    * @example Here this is and example of being used to zoom in and set a popup on load
    */
   async function mapEffect({ leafletElement: map } = {}) {
-    // let response;
-
-    // try {
-    //   response = await axios.get(
-    //     "https://covidtracking.com/api/v1/states/current.json"
-    //   );
-    // } catch (e) {
-    //   console.log(`Failed to fetch states: ${e.message}`, e);
-    //   return;
-    // }
-
-    // const { data = [] } = response;
-    // const hasData = Array.isArray(data) && data.length > 0;
-    // if (!hasData) {
-    //   return;
-    // }
-    // console.log(data);
-
     const geoJson = {
       type: "FeatureCollection",
       features: current.map((state = {}) => {
@@ -123,24 +104,10 @@ const IndexPage = () => {
   return (
     <Layout pageName="home">
       <Helmet>
-        <title>Home Page</title>
+        <title>COVID-19 Map</title>
       </Helmet>
 
       <Map {...mapSettings}></Map>
-
-      <Container type="content" className="text-center home-start">
-        <h2>Still Getting Started?</h2>
-        <p>Run the following in your terminal!</p>
-        <pre>
-          <code>
-            gatsby new [directory]
-            https://github.com/colbyfayock/gatsby-starter-leaflet
-          </code>
-        </pre>
-        <p className="note">
-          Note: Gatsby CLI required globally for the above command
-        </p>
-      </Container>
     </Layout>
   );
 };
