@@ -10,4 +10,4 @@
 
 ## Known Errors:
 
-- Unable to connect the separate .JS files/webpages. They are separate at the moment.
+- Unable to connect the graphs from /graphs directory and information regarding whether the state is open or not from /state_policy. They are separate at the moment.
